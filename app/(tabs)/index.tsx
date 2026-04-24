@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,8 +16,10 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius } from '../../constants/theme';
+import { WallpaperBackground } from '../../components/WallpaperBackground';
 import { RECIPES, TRENDING_TAGS, Recipe } from '../../constants/data';
 
 const DIETARY_OPTIONS = ['Vegan', 'Vegetarian', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Keto', 'Paleo', 'Low-FODMAP'];
@@ -300,6 +303,7 @@ Schema (no markdown, no fences — raw JSON only):
   );
 
   return (
+    <WallpaperBackground>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
         style={styles.container}
@@ -308,7 +312,7 @@ Schema (no markdown, no fences — raw JSON only):
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingHorizontal: 24 }]}>
           <View>
             <Text style={styles.greeting}>Good Morning</Text>
             <Text style={styles.userName}>Abdul Khabeer</Text>
@@ -320,7 +324,7 @@ Schema (no markdown, no fences — raw JSON only):
         </View>
 
         {/* Smart Swapper Hero */}
-        <View style={styles.heroCard}>
+        <View style={[styles.heroCard, { marginHorizontal: 24 }]}>
           <View style={styles.heroTop}>
             <View style={styles.heroIconWrap}>
               <Ionicons name="flash" size={22} color={colors.primary} />
@@ -518,10 +522,10 @@ Schema (no markdown, no fences — raw JSON only):
         )}
 
         {/* Divider */}
-        <View style={styles.divider} />
+        <View style={[styles.divider, { marginHorizontal: 24 }]} />
 
         {/* Trending Tags */}
-        <View style={styles.section}>
+        <View style={[styles.section, { paddingHorizontal: 24 }]}>
           <Text style={styles.sectionLabel}>Trending Now</Text>
           <ScrollView
             horizontal
@@ -550,7 +554,7 @@ Schema (no markdown, no fences — raw JSON only):
         </View>
 
         {/* Recommended */}
-        <View style={styles.section}>
+        <View style={[styles.section, { paddingHorizontal: 24 }]}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionLabel}>
               {activeTag
@@ -580,6 +584,7 @@ Schema (no markdown, no fences — raw JSON only):
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
+    </WallpaperBackground>
   );
 }
 
@@ -638,10 +643,35 @@ const ddStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   container: { flex: 1 },
-  content: { paddingHorizontal: 24 },
+  content: { paddingHorizontal: 0 },
+
+  heroBanner: {
+    width: '100%',
+    height: 200,
+    marginBottom: 20,
+  },
+  heroBannerImage: {
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+  },
+  heroBannerGradient: {
+    flex: 1,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 20,
+    justifyContent: 'space-between',
+  },
+  heroBannerTag: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.82)',
+    letterSpacing: 0.3,
+  },
 
   header: {
     flexDirection: 'row',

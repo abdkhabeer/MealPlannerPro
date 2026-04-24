@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius } from '../../constants/theme';
+import { WallpaperBackground } from '../../components/WallpaperBackground';
 import { COOKING_COURSES } from '../../constants/data';
 
 type Course = typeof COOKING_COURSES[0] & { level: number };
@@ -125,6 +126,7 @@ export default function SchoolScreen() {
   const isMaxLevel = levelIndex === LEVEL_META.length - 1;
 
   return (
+    <WallpaperBackground>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
         style={styles.container}
@@ -231,13 +233,14 @@ export default function SchoolScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
+    </WallpaperBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   container: { flex: 1 },
   content: {

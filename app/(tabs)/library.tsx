@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius } from '../../constants/theme';
+import { WallpaperBackground } from '../../components/WallpaperBackground';
 import { RECIPES, Recipe } from '../../constants/data';
 
 function LibraryCard({ recipe, onPress }: { recipe: Recipe; onPress: () => void }) {
@@ -39,6 +40,7 @@ export default function LibraryScreen() {
   const router = useRouter();
 
   return (
+    <WallpaperBackground>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>My Library</Text>
@@ -66,13 +68,14 @@ export default function LibraryScreen() {
         )}
       />
     </SafeAreaView>
+    </WallpaperBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -91,7 +94,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

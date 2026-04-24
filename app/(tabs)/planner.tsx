@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius } from '../../constants/theme';
+import { WallpaperBackground } from '../../components/WallpaperBackground';
 import { RECIPES } from '../../constants/data';
 import { usePlannerContext, MealSlot, WeekPlans, EMPTY_SLOT } from '../../context/PlannerContext';
 
@@ -179,6 +180,7 @@ export default function PlannerScreen() {
   };
 
   return (
+    <WallpaperBackground>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
         style={styles.container}
@@ -593,13 +595,14 @@ export default function PlannerScreen() {
         </View>
       </Modal>
     </SafeAreaView>
+    </WallpaperBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   container: { flex: 1 },
   content: {
@@ -621,7 +624,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -636,7 +639,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 999,
     padding: 8,
     borderWidth: 1,
@@ -693,7 +696,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -717,7 +720,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   summary: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: radius.lg,
     padding: 24,
     flexDirection: 'row',
@@ -895,7 +898,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 16,
     padding: 12,
     marginBottom: 10,
@@ -940,7 +943,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 68,
     right: 24,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border + '66',
@@ -1079,7 +1082,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
@@ -1115,7 +1118,7 @@ const styles = StyleSheet.create({
   },
   macroBox: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 14,
     paddingVertical: 18,
     paddingHorizontal: 8,
@@ -1157,7 +1160,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 6,
     height: 160,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
@@ -1213,7 +1216,7 @@ const styles = StyleSheet.create({
     top: '30%',
     left: 32,
     right: 32,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
@@ -1279,7 +1282,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 16,
     padding: 18,
     marginBottom: 10,

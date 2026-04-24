@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
   FlatList,
+  ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +18,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius } from '../constants/theme';
 import { LESSONS, COOKING_COURSES } from '../constants/data';
@@ -77,19 +79,29 @@ function OptionBtn({ label, emoji, selected, onPress }: { label: string; emoji?:
 function Screen1Hook({ onNext }: { onNext: () => void }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[s.screen, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
-      <View style={s.hookHero}>
-        <Text style={s.hookEmoji}>🍳</Text>
+    <ImageBackground
+      source={{ uri: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=900&q=80' }}
+      style={{ flex: 1 }}
+    >
+      <LinearGradient
+        colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.72)']}
+        style={[s.hookHero, { paddingTop: insets.top + 32, paddingBottom: insets.bottom + 32 }]}
+      >
+        {/* Quote bubble */}
         <View style={s.hookBubble}>
           <Text style={s.hookQuote}>"You open the fridge. Nothing looks right. You order takeout again."</Text>
         </View>
-      </View>
-      <View style={s.hookBottom}>
-        <Text style={s.hookHeadline}>Sound familiar?</Text>
-        <Text style={s.hookSub}>You're not alone — and it's not your fault. Most people were never taught how to make cooking effortless.</Text>
-        <NextBtn onPress={onNext} label="Yes, that's me" />
-      </View>
-    </View>
+
+        {/* Bottom CTA */}
+        <View style={s.hookBottom}>
+          <Text style={s.hookHeadline}>Sound familiar?</Text>
+          <Text style={s.hookSub}>You're not alone — and it's not your fault. Most people were never taught how to make cooking effortless.</Text>
+          <Pressable style={s.hookBtn} onPress={onNext}>
+            <Text style={s.hookBtnText}>Yes, that's me  →</Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
@@ -834,7 +846,7 @@ export default function OnboardingScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: 'transparent' },
   progressRow: { flexDirection: 'row', gap: 3, paddingHorizontal: 24, paddingTop: 12 },
   progressSegment: { flex: 1, height: 3, borderRadius: 2, backgroundColor: colors.muted },
   progressSegmentActive: { backgroundColor: colors.primary },
@@ -846,18 +858,27 @@ const s = StyleSheet.create({
   screen: { flex: 1, paddingHorizontal: 24, gap: 20 },
 
   // Hook
-  hookHero: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 24 },
-  hookEmoji: { fontSize: 64 },
-  hookBubble: {
-    backgroundColor: colors.card, borderRadius: 20, padding: 24,
-    borderWidth: 1, borderColor: colors.border + '4D',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06, shadowRadius: 12, elevation: 3,
+  hookHero: {
+    flex: 1, justifyContent: 'space-between',
+    paddingHorizontal: 24,
   },
-  hookQuote: { fontSize: 18, fontWeight: '600', color: colors.foreground, lineHeight: 28, fontStyle: 'italic' },
-  hookBottom: { gap: 12 },
-  hookHeadline: { fontSize: 26, fontWeight: '800', color: colors.foreground },
-  hookSub: { fontSize: 15, color: colors.mutedForeground, lineHeight: 22 },
+  hookBubble: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 20, padding: 24,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+    marginTop: 40,
+  },
+  hookQuote: { fontSize: 20, fontWeight: '600', color: '#fff', lineHeight: 30, fontStyle: 'italic' },
+  hookBottom: { gap: 14 },
+  hookHeadline: { fontSize: 32, fontWeight: '800', color: '#fff' },
+  hookSub: { fontSize: 15, color: 'rgba(255,255,255,0.82)', lineHeight: 22 },
+  hookBtn: {
+    height: 56, backgroundColor: '#fff', borderRadius: 999,
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2, shadowRadius: 12, elevation: 6,
+  },
+  hookBtnText: { fontSize: 16, fontWeight: '800', color: colors.primary },
 
   // Cost
   centeredContent: { flex: 1, justifyContent: 'center', gap: 24 },

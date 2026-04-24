@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius } from '../../constants/theme';
+import { WallpaperBackground } from '../../components/WallpaperBackground';
 import { SHOPPING_CATEGORIES, ShoppingItem } from '../../constants/data';
 
 type Category = typeof SHOPPING_CATEGORIES[0] & { items: ShoppingItem[] };
@@ -74,6 +75,7 @@ export default function ShopScreen() {
   );
 
   return (
+    <WallpaperBackground>
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       {/* Sticky Header */}
       <View style={styles.header}>
@@ -168,13 +170,14 @@ export default function ShopScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
+    </WallpaperBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -183,7 +186,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 8,
     paddingBottom: 16,
-    backgroundColor: 'rgba(245,239,228,0.8)',
+    backgroundColor: 'rgba(245,239,228,0.55)',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border + '33',
   },
@@ -200,7 +203,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
   addBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: 20,
     paddingHorizontal: 16,
     height: 56,
@@ -300,7 +303,7 @@ const styles = StyleSheet.create({
     color: colors.mutedForeground,
   },
   itemsCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderRadius: radius.lg,
     paddingVertical: 8,
     shadowColor: '#000',
