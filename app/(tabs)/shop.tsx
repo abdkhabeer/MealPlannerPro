@@ -1,7 +1,8 @@
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   Alert,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,18 +10,82 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius } from '../../constants/theme';
 import { WallpaperBackground } from '../../components/WallpaperBackground';
 import { SHOPPING_CATEGORIES, ShoppingItem } from '../../constants/data';
 
 type Category = typeof SHOPPING_CATEGORIES[0] & { items: ShoppingItem[] };
 
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  produce: [
+    'apple', 'banana', 'tomato', 'onion', 'garlic', 'lemon', 'lime', 'orange', 'avocado',
+    'spinach', 'lettuce', 'kale', 'broccoli', 'carrot', 'potato', 'pepper', 'cucumber',
+    'zucchini', 'mushroom', 'celery', 'ginger', 'cilantro', 'parsley', 'basil', 'mint',
+    'herb', 'berry', 'strawberry', 'blueberry', 'raspberry', 'grape', 'mango', 'pineapple',
+    'watermelon', 'melon', 'peach', 'pear', 'plum', 'cherry', 'corn', 'asparagus',
+    'eggplant', 'squash', 'pumpkin', 'cabbage', 'cauliflower', 'beet', 'radish', 'leek',
+    'shallot', 'scallion', 'arugula', 'fennel', 'chard', 'chive', 'dill', 'thyme',
+    'rosemary', 'sage', 'oregano', 'chilli', 'chili', 'jalapeño', 'jalapeno', 'sweet potato',
+    'butternut', 'courgette', 'aubergine', 'spring onion', 'bok choy',
+  ],
+  dairy: [
+    'milk', 'cream', 'butter', 'cheese', 'yogurt', 'yoghurt', 'egg', 'eggs',
+    'mozzarella', 'cheddar', 'parmesan', 'brie', 'feta', 'ricotta', 'cottage',
+    'sour cream', 'half and half', 'whipping', 'ghee', 'kefir', 'custard',
+  ],
+  meat: [
+    'chicken', 'beef', 'pork', 'lamb', 'turkey', 'salmon', 'shrimp', 'prawn',
+    'fish', 'cod', 'tilapia', 'bass', 'steak', 'mince', 'ground beef', 'ground turkey',
+    'bacon', 'ham', 'sausage', 'duck', 'veal', 'venison', 'bison', 'crab', 'lobster',
+    'scallop', 'anchovy', 'sardine', 'halibut', 'trout', 'snapper', 'tuna steak',
+    'pork chop', 'pork loin', 'rib', 'brisket', 'sirloin', 'fillet', 'meatball',
+  ],
+};
+
+function inferCategory(name: string): string {
+  const lower = name.toLowerCase();
+  for (const [categoryId, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (keywords.some((kw) => lower.includes(kw))) return categoryId;
+  }
+  return 'pantry';
+}
+
+const QUICK_ADD_SECTIONS = [
+  {
+    label: 'Produce',
+    categoryId: 'produce',
+    emoji: '🥦',
+    items: ['Bananas', 'Apples', 'Tomatoes', 'Onions', 'Garlic', 'Lemons', 'Avocado', 'Broccoli', 'Carrots', 'Baby Spinach', 'Bell Peppers', 'Potatoes'],
+  },
+  {
+    label: 'Pantry',
+    categoryId: 'pantry',
+    emoji: '🫙',
+    items: ['Olive Oil', 'Salt', 'Black Pepper', 'Flour', 'Sugar', 'Rice', 'Pasta', 'Canned Tomatoes', 'Tuna (canned)', 'Chicken Stock', 'Bread', 'Oats', 'Honey'],
+  },
+  {
+    label: 'Dairy & Eggs',
+    categoryId: 'dairy',
+    emoji: '🥛',
+    items: ['Eggs', 'Milk', 'Butter', 'Cheddar Cheese', 'Greek Yogurt', 'Heavy Cream', 'Sour Cream'],
+  },
+  {
+    label: 'Meat & Fish',
+    categoryId: 'meat',
+    emoji: '🥩',
+    items: ['Chicken Breast', 'Ground Beef', 'Salmon', 'Bacon', 'Shrimp', 'Pork Chops', 'Lamb Mince', 'Cod Fillet'],
+  },
+];
+
 export default function ShopScreen() {
+  const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>(
     SHOPPING_CATEGORIES.map((c) => ({ ...c, items: c.items.map((i) => ({ ...i })) }))
   );
   const [newItem, setNewItem] = useState('');
+  const [quickAddVisible, setQuickAddVisible] = useState(false);
+  const [selectedQuickItems, setSelectedQuickItems] = useState<Set<string>>(new Set());
 
   const toggleItem = (categoryId: string, itemId: string) => {
     setCategories((prev) =>
@@ -38,16 +103,17 @@ export default function ShopScreen() {
 
   const addCustomItem = () => {
     if (!newItem.trim()) return;
+    const categoryId = inferCategory(newItem.trim());
     const item: ShoppingItem = {
       id: Date.now().toString(),
       name: newItem.trim(),
       source: 'Custom',
       checked: false,
-      category: 'pantry',
+      category: categoryId,
     };
     setCategories((prev) =>
       prev.map((cat) => {
-        if (cat.id !== 'pantry') return cat;
+        if (cat.id !== categoryId) return cat;
         return { ...cat, items: [...cat.items, item] };
       })
     );
@@ -68,6 +134,42 @@ export default function ShopScreen() {
     ]);
   };
 
+  const toggleQuickItem = (name: string) => {
+    setSelectedQuickItems((prev) => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  };
+
+  const confirmQuickAdd = () => {
+    if (selectedQuickItems.size === 0) return;
+    setCategories((prev) => {
+      let next = prev.map((cat) => ({ ...cat, items: [...cat.items] }));
+      QUICK_ADD_SECTIONS.forEach((section) => {
+        section.items.forEach((name) => {
+          if (!selectedQuickItems.has(name)) return;
+          const targetCat = next.find((c) => c.id === section.categoryId) ?? next[1];
+          const alreadyExists = targetCat.items.some(
+            (i) => i.name.toLowerCase() === name.toLowerCase()
+          );
+          if (!alreadyExists) {
+            targetCat.items.push({
+              id: `qa-${Date.now()}-${name}`,
+              name,
+              source: 'Quick Add',
+              checked: false,
+              category: targetCat.id,
+            });
+          }
+        });
+      });
+      return next;
+    });
+    setSelectedQuickItems(new Set());
+    setQuickAddVisible(false);
+  };
+
   const totalItems = categories.reduce((sum, c) => sum + c.items.length, 0);
   const checkedCount = categories.reduce(
     (sum, c) => sum + c.items.filter((i) => i.checked).length,
@@ -81,8 +183,8 @@ export default function ShopScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Shopping List</Text>
         <View style={styles.headerActions}>
-          <Pressable style={styles.iconBtn}>
-            <MaterialIcons name="sort" size={20} color={colors.foreground} />
+          <Pressable style={styles.iconBtn} onPress={() => { setSelectedQuickItems(new Set()); setQuickAddVisible(true); }}>
+            <Ionicons name="flash-outline" size={20} color={colors.foreground} />
           </Pressable>
           <Pressable style={styles.iconBtn} onPress={clearChecked}>
             <Ionicons name="trash-outline" size={20} color={colors.destructive} />
@@ -170,6 +272,58 @@ export default function ShopScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
+
+    {/* Quick Add Modal */}
+    <Modal visible={quickAddVisible} animationType="slide" transparent onRequestClose={() => setQuickAddVisible(false)}>
+      <Pressable style={styles.modalBackdrop} onPress={() => setQuickAddVisible(false)} />
+      <View style={[styles.modalSheet, { paddingBottom: insets.bottom + 24 }]}>
+        <View style={styles.modalHandle} />
+        <View style={styles.modalHeader}>
+          <View>
+            <Text style={styles.modalTitle}>Quick Add</Text>
+            <Text style={styles.modalSub}>Tap items to add to your list</Text>
+          </View>
+          <Pressable onPress={() => setQuickAddVisible(false)} style={styles.modalClose}>
+            <Ionicons name="close" size={20} color={colors.foreground} />
+          </Pressable>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} style={styles.modalScroll}>
+          {QUICK_ADD_SECTIONS.map((section) => (
+            <View key={section.label} style={styles.quickSection}>
+              <Text style={styles.quickSectionLabel}>{section.emoji}  {section.label}</Text>
+              <View style={styles.quickChips}>
+                {section.items.map((name) => {
+                  const selected = selectedQuickItems.has(name);
+                  return (
+                    <Pressable
+                      key={name}
+                      onPress={() => toggleQuickItem(name)}
+                      style={[styles.chip, selected && styles.chipSelected]}
+                    >
+                      {selected && <Ionicons name="checkmark" size={12} color="#fff" style={{ marginRight: 4 }} />}
+                      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{name}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          ))}
+          <View style={{ height: 16 }} />
+        </ScrollView>
+
+        <Pressable
+          style={[styles.addBtn, selectedQuickItems.size === 0 && styles.addBtnDisabled]}
+          onPress={confirmQuickAdd}
+          disabled={selectedQuickItems.size === 0}
+        >
+          <Text style={styles.addBtnText}>
+            {selectedQuickItems.size === 0 ? 'Select items to add' : `Add ${selectedQuickItems.size} item${selectedQuickItems.size !== 1 ? 's' : ''} to list`}
+          </Text>
+        </Pressable>
+      </View>
+    </Modal>
+
     </WallpaperBackground>
   );
 }
@@ -356,5 +510,113 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border + '40',
     marginLeft: 56,
+  },
+  // Modal
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  modalSheet: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 16,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.border,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.foreground,
+    marginBottom: 2,
+  },
+  modalSub: {
+    fontSize: 13,
+    color: colors.mutedForeground,
+  },
+  modalClose: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.muted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalScroll: {
+    flexGrow: 0,
+  },
+  quickSection: {
+    marginBottom: 20,
+  },
+  quickSectionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 10,
+  },
+  quickChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: colors.muted,
+    borderWidth: 1,
+    borderColor: colors.border + '66',
+  },
+  chipSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  chipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.foreground,
+  },
+  chipTextSelected: {
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  addBtn: {
+    marginTop: 16,
+    height: 52,
+    borderRadius: 999,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addBtnDisabled: {
+    opacity: 0.4,
+  },
+  addBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#ffffff',
   },
 });

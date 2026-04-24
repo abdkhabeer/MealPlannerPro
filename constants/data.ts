@@ -504,6 +504,13 @@ export const SHOPPING_CATEGORIES: { id: string; label: string; emoji: string; bg
       },
     ],
   },
+  {
+    id: 'meat',
+    label: 'Meat & Fish',
+    emoji: '🥩',
+    bgColor: '#fee2e2',
+    items: [],
+  },
 ];
 
 export const COOKING_COURSES = [

@@ -80,7 +80,7 @@ function Screen1Hook({ onNext }: { onNext: () => void }) {
   const insets = useSafeAreaInsets();
   return (
     <ImageBackground
-      source={{ uri: 'https://images.unsplash.com/photo-1640937078020-2e8ac370a894?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }}
+      source={require('../assets/mealPlannerProFridge.jpeg')}
       style={{ flex: 1 }}
     >
       <LinearGradient
@@ -751,7 +751,7 @@ function Screen17Paywall({ onComplete }: { onComplete: () => void }) {
   const [plan, setPlan] = useState<'monthly' | 'annual'>('monthly');
   return (
     <View style={[s.screen, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
-      <Text style={s.paywallTitle}>Less than your morning coffee ☕</Text>
+      <Text style={s.paywallTitle}>{plan === 'annual' ? 'Less than your morning coffee ☕' : 'Less than one takeout delivery fee'}</Text>
       <Text style={s.paywallSub}>And it actually teaches you something.</Text>
 
       <View style={s.planToggle}>
