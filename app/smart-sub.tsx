@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -86,15 +85,20 @@ export default function SmartSubScreen() {
     setResults([]);
 
     try {
-      const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-
-      const message = await client.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
-        messages: [
-          {
-            role: 'user',
-            content: `You are a culinary expert helping home cooks adapt recipes.
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1024,
+          messages: [
+            {
+              role: 'user',
+              content: `You are a culinary expert helping home cooks adapt recipes.
 
 Ingredients:
 ${ingredientsText}
@@ -116,11 +120,12 @@ Schema:
 ]
 
 Respond with JSON only — no markdown fences, no explanation outside the array.`,
-          },
-        ],
+            },
+          ],
+        }),
       });
-
-      let text = message.content[0].type === 'text' ? message.content[0].text.trim() : '[]';
+      const data = await response.json();
+      let text = data.content?.[0]?.text?.trim() ?? '[]';
       text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
       setResults(JSON.parse(text));
     } catch (e: any) {

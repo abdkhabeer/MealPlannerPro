@@ -1,20 +1,25 @@
 {
   "expo": {
-    "name": "MealPlannerPro",
+    "name": "KitchenIQ Pro",
     "slug": "MealPlannerPro",
-    "scheme": "mealplannerpro",
+    "scheme": "kitcheniqpro",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#F5EFE4"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.abdulkhabeer.mealplannerpro",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +34,20 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
-    ]
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow KitchenIQ Pro to access your photos to upload recipe images.",
+          "cameraPermission": "Allow KitchenIQ Pro to use your camera to photograph recipes."
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "08127314-2ff3-4710-97e4-4e289f474311"
+      }
+    }
   }
 }

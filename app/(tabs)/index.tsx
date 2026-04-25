@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -165,27 +164,35 @@ export default function HomeScreen() {
     setExtracting(true);
     setError(null);
     try {
-      const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-      const message = await client.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1500,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: mimeType as any, data: base64 },
-              },
-              {
-                type: 'text',
-                text: 'Extract the full recipe from this image — include the title, all ingredients with quantities, and all preparation steps. Format it cleanly as plain text. If this is not a recipe image, say so briefly.',
-              },
-            ],
-          },
-        ],
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1500,
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'image',
+                  source: { type: 'base64', media_type: mimeType, data: base64 },
+                },
+                {
+                  type: 'text',
+                  text: 'Extract the full recipe from this image — include the title, all ingredients with quantities, and all preparation steps. Format it cleanly as plain text. If this is not a recipe image, say so briefly.',
+                },
+              ],
+            },
+          ],
+        }),
       });
-      const extracted = message.content[0].type === 'text' ? message.content[0].text.trim() : '';
+      const data = await response.json();
+      const extracted = data.content?.[0]?.text?.trim() ?? '';
       setRecipeText(extracted);
     } catch (e: any) {
       setError(e.message ?? 'Failed to extract recipe from image.');
@@ -255,14 +262,20 @@ export default function HomeScreen() {
     setResults([]);
 
     try {
-      const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-      const message = await client.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1500,
-        messages: [
-          {
-            role: 'user',
-            content: `You are a culinary expert helping home cooks adapt recipes.
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1500,
+          messages: [
+            {
+              role: 'user',
+              content: `You are a culinary expert helping home cooks adapt recipes.
 
 The user has pasted this recipe:
 ---
@@ -284,11 +297,12 @@ Schema (no markdown, no fences — raw JSON only):
     "tip": "short cooking adjustment if needed"
   }
 ]`,
-          },
-        ],
+            },
+          ],
+        }),
       });
-
-      let text = message.content[0].type === 'text' ? message.content[0].text.trim() : '[]';
+      const data = await response.json();
+      let text = data.content?.[0]?.text?.trim() ?? '[]';
       text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
       setResults(JSON.parse(text));
     } catch (e: any) {

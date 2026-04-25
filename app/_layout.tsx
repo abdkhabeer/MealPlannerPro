@@ -8,17 +8,20 @@ import { CourseProvider } from '../context/CourseContext';
 import { OnboardingProvider } from '../context/OnboardingContext';
 import { PlannerProvider } from '../context/PlannerContext';
 
-const WALLPAPER = 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1200&q=80';
 
 export default function RootLayout() {
   useEffect(() => {
-    AsyncStorage.removeItem('onboarding_complete').then(() => {
-      router.replace('/onboarding' as never);
+    AsyncStorage.getItem('onboarding_complete').then((value) => {
+      if (value === null) {
+        router.replace('/onboarding' as never);
+      } else {
+        router.replace('/(tabs)' as never);
+      }
     });
   }, []);
 
   return (
-    <ImageBackground source={{ uri: WALLPAPER }} style={styles.root} imageStyle={styles.wallpaper}>
+    <ImageBackground source={require('../assets/mealPlannerProWallpaper.jpeg')} style={styles.root} imageStyle={styles.wallpaper}>
       <SafeAreaProvider style={styles.transparent}>
         <OnboardingProvider>
         <PlannerProvider>
@@ -48,7 +51,7 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   transparent: { flex: 1, backgroundColor: 'transparent' },
   wallpaper: {
-    opacity: 0.25,
+    opacity: 0.35,
     resizeMode: 'cover',
   },
 });

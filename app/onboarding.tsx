@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -400,19 +399,27 @@ function Screen11SwapperDemo({ onNext }: { onNext: () => void }) {
     if (!apiKey || !ingredients.trim()) return;
     setLoading(true);
     try {
-      const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-      const msg = await client.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        messages: [{
-          role: 'user',
-          content: `Given these fridge ingredients: ${ingredients}. Suggest TWO different simple meals. Format exactly as:
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 400,
+          messages: [{
+            role: 'user',
+            content: `Given these fridge ingredients: ${ingredients}. Suggest TWO different simple meals. Format exactly as:
 RECIPE1: **[Meal Name]** [2 sentence description]
 RECIPE2: **[Meal Name]** [2 sentence description]
 Make them distinct — different styles or ingredients emphasis. Be encouraging and practical.`,
-        }],
+          }],
+        }),
       });
-      const raw = msg.content[0].type === 'text' ? msg.content[0].text : '';
+      const resData = await res.json();
+      const raw = resData.content?.[0]?.text ?? '';
       // Try structured format first, fall back to splitting on blank line
       let r1 = raw.match(/RECIPE1:\s*([\s\S]+?)(?=RECIPE2:|$)/i)?.[1]?.trim() ?? '';
       let r2 = raw.match(/RECIPE2:\s*([\s\S]+)/i)?.[1]?.trim() ?? '';
@@ -441,18 +448,24 @@ Make them distinct — different styles or ingredients emphasis. Be encouraging 
     const apiKey = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
     if (!apiKey) return;
     try {
-      const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-      const matchMsg = await client.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 10,
-        messages: [{
-          role: 'user',
-          content: `Recipe: "${chosen}". Lessons: ${LESSON_CATALOG}. Reply with ONLY the lesson ID (e.g. b5) most relevant to this recipe's cooking technique.`,
-        }],
+      const matchRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 10,
+          messages: [{
+            role: 'user',
+            content: `Recipe: "${chosen}". Lessons: ${LESSON_CATALOG}. Reply with ONLY the lesson ID (e.g. b5) most relevant to this recipe's cooking technique.`,
+          }],
+        }),
       });
-      const matchedId = matchMsg.content[0].type === 'text'
-        ? matchMsg.content[0].text.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
-        : '';
+      const matchData = await matchRes.json();
+      const matchedId = matchData.content?.[0]?.text?.trim().toLowerCase().replace(/[^a-z0-9]/g, '') ?? '';
       if (matchedId) setAnswer('matchedLessonId', matchedId);
     } catch {}
   };
@@ -893,7 +906,7 @@ const s = StyleSheet.create({
 
   // Screen generic
   screenTitle: { fontSize: 26, fontWeight: '800', color: colors.foreground, lineHeight: 34 },
-  screenSub: { fontSize: 15, color: colors.mutedForeground, lineHeight: 22 },
+  screenSub: { fontSize: 15, color: '#4A4540', lineHeight: 22 },
 
   // Solution features
   featureList: { flex: 1, justifyContent: 'center', gap: 16 },
